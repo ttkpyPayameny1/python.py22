@@ -1,4 +1,97 @@
-{% extends 'base.html' %}{% block title %}CloudNest — Bot Hosting{% endblock %}{% block content %}
-<section class="hero"><div><div class="pill">● Developer-friendly hosting</div><h1>আপনার বট, <span class="grad">আপনার নিয়ন্ত্রণে।</span></h1><p class="lead">এক জায়গায় hosting plans, deployment history, deposits এবং support পরিচালনা করুন। GitHub সংযোগ ও provider deployment চালু করতে OAuth/API configuration প্রয়োজন।</p><div class="actions"><a class="btn" href="{{ url_for('register') }}">ফ্রি শুরু করুন ↗</a><a class="btn ghost" href="#plans">প্ল্যান দেখুন</a></div><div class="mini-stats"><div><b>25 দিন</b><span>সর্বোচ্চ প্ল্যান</span></div><div><b>24/7</b><span>ড্যাশবোর্ড অ্যাক্সেস</span></div><div><b>Secure</b><span>Account ID</span></div></div></div><div class="hero-card"><div class="window-head"><span></span><span></span><span></span><b>deployment.status</b></div><div class="terminal"><p class="muted">$ cloudnest deploy --check</p><p class="success">✓ Subscription verified</p><p class="success">✓ Repository request received</p><p class="warn">! Provider integration required</p><div class="progress"><i></i></div><small>Designed for a clear deployment workflow</small></div><div class="floating">✦ Hosting workspace</div></div></section>
-<section id="plans" class="section"><div class="section-title"><div><div class="pill">Flexible plans</div><h2>আপনার জন্য সঠিক প্ল্যান</h2></div><p>মূল্য ও মেয়াদ অ্যাডমিন প্যানেল থেকে পরিবর্তনযোগ্য।</p></div><div class="grid plans">{% for p in plans %}<article class="card plan"><div class="plan-top"><span class="plan-icon">✦</span><span class="tag">{{ 'FREE TRIAL' if p.is_trial else 'HOSTING' }}</span></div><h3>{{ p.name }}</h3><div class="price">{% if p.price == 0 %}ফ্রি{% else %}৳{{ '%.0f'|format(p.price) }}{% endif %}<small>/ {{ p.duration_hours }} ঘণ্টা</small></div><p class="muted">সময়সীমা শেষে subscription মেয়াদোত্তীর্ণ হবে।</p><a class="btn full" href="{{ url_for('register') }}">প্ল্যান নিন</a></article>{% endfor %}</div></section>
-<section class="section feature-grid"><div class="feature"><span>⌘</span><h3>Deployment tracking</h3><p>প্রতিটি deployment request, status ও log history এক জায়গায়।</p></div><div class="feature"><span>◈</span><h3>Admin control</h3><p>ইউজার, প্ল্যান, ডিপোজিট ও সাপোর্ট পরিচালনার প্যানেল।</p></div><div class="feature"><span>⏱</span><h3>Expiry-aware plans</h3><p>Subscription end time সংরক্ষণ ও expiry status ট্র্যাকিং।</p></div></section>{% endblock %}
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CloudNest Hosting</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #0b1020;
+            color: #f8fafc;
+        }
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 7%;
+            background: #111a30;
+            border-bottom: 1px solid #273451;
+        }
+        .logo { font-size: 23px; font-weight: bold; color: #8b9cff; }
+        a { color: inherit; text-decoration: none; }
+        .links a { margin-left: 15px; }
+        .hero { text-align: center; padding: 75px 18px 45px; }
+        .hero h1 { font-size: clamp(35px, 7vw, 60px); margin-bottom: 15px; }
+        .hero p { color: #bac5dc; line-height: 1.8; }
+        .btn {
+            display: inline-block;
+            background: #6575f5;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 9px;
+            margin: 10px 5px;
+        }
+        .plans {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 18px;
+            padding: 25px 7% 65px;
+        }
+        .card {
+            background: #151e34;
+            border: 1px solid #2b3857;
+            border-radius: 15px;
+            padding: 23px;
+        }
+        .price { font-size: 29px; font-weight: bold; color: #a5b4fc; }
+        .muted { color: #bac5dc; }
+        footer { text-align: center; padding: 25px; color: #bac5dc; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">☁ CloudNest</div>
+        <div class="links">
+            <a href="/">Home</a>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Your Bots, <span style="color:#8b9cff">Our Cloud.</span></h1>
+        <p>সহজেই আপনার GitHub প্রজেক্টের হোস্টিং পরিচালনা করুন।</p>
+        <a class="btn" href="/register">Get Started</a>
+        <a class="btn" href="/login">Login</a>
+    </section>
+
+    <h2 style="text-align:center">Our Hosting Plans</h2>
+
+    <section class="plans">
+        {% for plan in plans %}
+        <article class="card">
+            <h3>{{ plan["name"] }}</h3>
+            <div class="price">
+                ৳{{ "%.2f"|format(plan["price"]) }}
+            </div>
+            <p class="muted">
+                Duration: {{ plan["duration_hours"] }} hours
+            </p>
+            {% if plan["is_trial"] %}
+                <p>Free trial plan</p>
+            {% else %}
+                <p>Paid hosting plan</p>
+            {% endif %}
+            <a class="btn" href="/register">Choose Plan</a>
+        </article>
+        {% else %}
+        <p>No hosting plans available right now.</p>
+        {% endfor %}
+    </section>
+
+    <footer>© {{ year }} CloudNest Hosting. All rights reserved.</footer>
+</body>
+</html>
